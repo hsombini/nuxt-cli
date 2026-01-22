@@ -15,6 +15,7 @@ import { templateNames } from '../../nuxi/src/utils/templates'
 
 import { description, name, version } from '../package.json'
 import { runCommand } from './run'
+import { setGlobalDispatcher, ProxyAgent } from "undici";
 
 const _main = defineCommand({
   meta: {
@@ -45,6 +46,11 @@ const _main = defineCommand({
     // Avoid background check to fix prompt issues
     if (command === 'init') {
       await backgroundTasks
+    }
+
+    if(process.env.HTTPS_PROXY) {
+      const dispatcher = new ProxyAgent({uri: new URL(process.env.HTTPS_PROXY).toString() });
+      setGlobalDispatcher(dispatcher);
     }
 
     if (command === 'add' && ctx.rawArgs[1] && templateNames.includes(ctx.rawArgs[1])) {
